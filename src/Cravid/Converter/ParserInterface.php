@@ -1,11 +1,11 @@
 <?php
 
-namespace Cravid\Converter\Driver;
+namespace Cravid\Converter;
 
 /**
- * Interface for concrete driver implementations.
+ * Interface for concrete Parser implementations.
  */
-interface DriverInterface
+interface ParserInterface
 {
     /**
      * Encodes a given array in the corresponding format.

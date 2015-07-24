@@ -2,8 +2,22 @@
 
 namespace Cravid\Converter;
 
-class Converter implements ConverterInterface
+class Converter
 {
+    /**
+     *
+     */
+    private $resolver = null;
+
+    
+    public function __construct(ParserResolver $resolver = null)
+    {
+        if ($resolver === null) {
+            $resolver = new ParserResolver();
+        }
+        $this->resolver = $resolver;
+    }
+    
     public function encodeTo($value, $format)
     {
         if (!$this->isFormatAvailable($format)) {
@@ -11,14 +25,14 @@ class Converter implements ConverterInterface
                 sprintf(
                     'Unexpected source format "%s", expected one the following: %s.', 
                     $format, 
-                    print_r($this->getAvailableFormats())
+                    print_r($this->getAvailableFormats(), true)
                 )
             );
         }
 
-        $driver = $this->resolver->resolve($format);
+        $Parser = $this->resolver->resolve($format);
         
-        return $driver->encode($value);
+        return $Parser->encode($value);
     }
 
     public function decodeFrom($value, $format)
@@ -28,27 +42,27 @@ class Converter implements ConverterInterface
                 sprintf(
                     'Unexpected source format "%s", expected one the following: %s.', 
                     $format, 
-                    print_r($this->getAvailableFormats())
+                    print_r($this->getAvailableFormats(), true)
                 )
             );
         }
 
-        $driver = $this->resolver->resolve($format);
+        $Parser = $this->resolver->resolve($format);
 
-        if (!$driver->isValid($value)) {
+        if (!$Parser->isValid($value)) {
             throw new \InvalidArgumentException(sprintf('Value is not a valid "%s".', $format));
         }
 
-        return $driver->decode($value);
+        return $Parser->decode($value);
     }
-
+    
     private function isFormatAvailable($format)
     {
-        return new \Reflection(new Format())->hasConstant($format);
+        return (new \ReflectionClass(new Format()))->hasConstant(strtoupper($format));
     }
 
     public function getAvailableFormats()
     {
-        return new \Reflection(new Format())->getConstants();
+        return (new \ReflectionClass(new Format()))->getConstants();
     }
 }

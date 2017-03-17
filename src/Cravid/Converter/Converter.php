@@ -7,7 +7,7 @@ class Converter
     /**
      *
      */
-    private $resolver = null;
+    protected $resolver = null;
 
     
     public function __construct(ParserResolver $resolver = null)
@@ -56,7 +56,7 @@ class Converter
         return $Parser->decode($value);
     }
     
-    private function isFormatAvailable($format)
+    public function isFormatAvailable($format)
     {
         return (new \ReflectionClass(new Format()))->hasConstant(strtoupper($format));
     }
